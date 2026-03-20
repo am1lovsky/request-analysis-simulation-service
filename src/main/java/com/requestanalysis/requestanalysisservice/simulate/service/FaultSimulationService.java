@@ -2,6 +2,8 @@ package com.requestanalysis.requestanalysisservice.simulate.service;
 
 import com.requestanalysis.requestanalysisservice.simulate.dto.FaultRequestDto;
 import com.requestanalysis.requestanalysisservice.simulate.dto.FaultResponseMeta;
+import com.requestanalysis.requestanalysisservice.simulate.model.Simulation;
+import com.requestanalysis.requestanalysisservice.simulate.repository.SimulationRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -13,13 +15,16 @@ public class FaultSimulationService {
 
     private final String patternError;
     private final String patternMessage;
+    private final SimulationRepository repository;
 
-    public FaultSimulationService(FaultSimulationServiceProperties properties) {
+    public FaultSimulationService(FaultSimulationServiceProperties properties, SimulationRepository repository) {
         this.patternError = properties.patternError();
         this.patternMessage = properties.patternMessage();
+        this.repository = repository;
     }
 
     public SimulatedResponse simulate(FaultRequestDto request) {
+        long start = System.currentTimeMillis();
         int statusCode = resolveStatusCode(request);
         long delay = resolveDelay(request);
         boolean isJsonBroken = resolveBrokenJson(request);
@@ -29,7 +34,14 @@ public class FaultSimulationService {
         String body = buildBody(baseMessage, responseSize, isJsonBroken);
         FaultResponseMeta meta = buildMeta(statusCode, delay, isJsonBroken, responseSize);
         log.info("Simulated fault meta: {}", meta);
+        long executionTime = System.currentTimeMillis() - start;
+        saveSimulation(request, meta, executionTime);
         return new SimulatedResponse(statusCode, body, meta);
+    }
+
+    private void saveSimulation(FaultRequestDto request, FaultResponseMeta meta, long executionTime) {
+        Simulation logEntry = new Simulation(null, request, meta, Instant.now(), executionTime);
+        repository.save(logEntry);
     }
 
     private int resolveStatusCode(FaultRequestDto request) {
