@@ -1,6 +1,6 @@
-package com.requestanalysis.requestanalysisservice.factory;
+package com.requestanalysis.requestanalysisservice.analysis.factory;
 
-import com.requestanalysis.requestanalysisservice.model.RequestDetails;
+import com.requestanalysis.requestanalysisservice.analysis.model.RequestDetails;
 import jakarta.servlet.http.HttpServletRequest;
 
 import java.util.Collections;

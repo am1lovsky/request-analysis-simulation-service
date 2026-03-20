@@ -1,4 +1,4 @@
-package com.requestanalysis.requestanalysisservice.model;
+package com.requestanalysis.requestanalysisservice.analysis.model;
 
 import lombok.Builder;
 import lombok.Data;

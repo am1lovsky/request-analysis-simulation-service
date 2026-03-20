@@ -1,7 +1,7 @@
-package com.requestanalysis.requestanalysisservice.controller;
+package com.requestanalysis.requestanalysisservice.analysis.controller;
 
-import com.requestanalysis.requestanalysisservice.factory.RequestDetailsFactory;
-import com.requestanalysis.requestanalysisservice.model.RequestDetails;
+import com.requestanalysis.requestanalysisservice.analysis.factory.RequestDetailsFactory;
+import com.requestanalysis.requestanalysisservice.analysis.model.RequestDetails;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestBody;
