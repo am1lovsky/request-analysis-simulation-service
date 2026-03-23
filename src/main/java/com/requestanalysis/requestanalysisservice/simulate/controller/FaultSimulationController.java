@@ -5,6 +5,7 @@ import com.requestanalysis.requestanalysisservice.simulate.model.Simulation;
 import com.requestanalysis.requestanalysisservice.simulate.repository.SimulationRepository;
 import com.requestanalysis.requestanalysisservice.simulate.service.FaultSimulationService;
 import com.requestanalysis.requestanalysisservice.simulate.service.SimulatedResponse;
+import jakarta.validation.Valid;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,7 +29,7 @@ public class FaultSimulationController {
     }
 
     @PostMapping("/simulate")
-    public ResponseEntity<Object> simulate(@RequestBody FaultRequestDto request,
+    public ResponseEntity<Object> simulate(@Valid @RequestBody FaultRequestDto request,
                                            @RequestParam(name = "isDebug", required = false, defaultValue = "false") boolean isDebug) {
         SimulatedResponse simulatedResponse = faultSimulationService.simulate(request);
         HttpStatus status = resolveHttpStatus(simulatedResponse);
