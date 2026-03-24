@@ -8,6 +8,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.Objects;
+import java.util.concurrent.atomic.AtomicReference;
 
 @Slf4j // - simplify logging
 @Service
@@ -16,11 +18,16 @@ public class FaultSimulationService {
     private final String patternError;
     private final String patternMessage;
     private final SimulationRepository repository;
+    private final AtomicReference<FaultRequestDto> currentConfiguration = new AtomicReference<>();
 
     public FaultSimulationService(FaultSimulationServiceProperties properties, SimulationRepository repository) {
         this.patternError = properties.patternError();
         this.patternMessage = properties.patternMessage();
         this.repository = repository;
+    }
+
+    public void configure(FaultRequestDto request) {
+        currentConfiguration.set(request);
     }
 
     public SimulatedResponse simulate(FaultRequestDto request) {
@@ -37,6 +44,11 @@ public class FaultSimulationService {
         long executionTime = System.currentTimeMillis() - start;
         saveSimulation(request, meta, executionTime);
         return new SimulatedResponse(statusCode, body, meta);
+    }
+
+    public SimulatedResponse simulate() {
+        FaultRequestDto configuration = currentConfiguration.get();
+        return simulate(Objects.requireNonNullElseGet(configuration, FaultRequestDto::new));
     }
 
     private void saveSimulation(FaultRequestDto request, FaultResponseMeta meta, long executionTime) {

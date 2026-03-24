@@ -5,7 +5,6 @@ import com.requestanalysis.requestanalysisservice.simulate.model.Simulation;
 import com.requestanalysis.requestanalysisservice.simulate.repository.SimulationRepository;
 import com.requestanalysis.requestanalysisservice.simulate.service.FaultSimulationService;
 import com.requestanalysis.requestanalysisservice.simulate.service.SimulatedResponse;
-import jakarta.validation.Valid;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,9 +28,8 @@ public class FaultSimulationController {
     }
 
     @PostMapping("/simulate")
-    public ResponseEntity<Object> simulate(@Valid @RequestBody FaultRequestDto request,
-                                           @RequestParam(name = "isDebug", required = false, defaultValue = "false") boolean isDebug) {
-        SimulatedResponse simulatedResponse = faultSimulationService.simulate(request);
+    public ResponseEntity<Object> simulate(@RequestParam(name = "isDebug", required = false, defaultValue = "false") boolean isDebug) {
+        SimulatedResponse simulatedResponse = faultSimulationService.simulate();
         HttpStatus status = resolveHttpStatus(simulatedResponse);
         return buildResponse(simulatedResponse, status, isDebug);
     }
@@ -39,6 +37,12 @@ public class FaultSimulationController {
     @GetMapping("/simulate/history")
     public List<Simulation> getHistory() {
         return repository.findAll(Sort.by(Sort.Direction.DESC, "createdAt"));
+    }
+
+    @PostMapping("/configure")
+    public ResponseEntity<Void> configure(@RequestBody FaultRequestDto request) {
+        faultSimulationService.configure(request);
+        return ResponseEntity.ok().build();
     }
 
     private HttpStatus resolveHttpStatus(SimulatedResponse simulatedResponse) {

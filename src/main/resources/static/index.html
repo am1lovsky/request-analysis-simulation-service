@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Request Analysis Tool</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container">
+    <h1>HTTP Fault Simulator</h1>
+
+    <form id="simulateForm">
+        <div class="row">
+            <input type="number" id="statusCode" placeholder="Status Code (e.g. 500)">
+            <input type="number" id="delay" placeholder="Delay (ms)">
+        </div>
+
+        <div class="row">
+            <input type="number" id="responseSize" placeholder="Response Size (KB)">
+            <input type="text" id="baseMessage" placeholder="Message">
+        </div>
+
+        <div class="row checkbox-row">
+            <label>
+                <input type="checkbox" id="brokenJson">
+                Broken JSON
+            </label>
+
+            <label>
+                <input type="checkbox" id="debug">
+                Debug Mode
+            </label>
+        </div>
+
+        <button type="submit">Simulate</button>
+    </form>
+
+    <h2>Response</h2>
+    <pre id="result">No response yet...</pre>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
