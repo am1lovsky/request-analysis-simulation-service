@@ -30,8 +30,31 @@ input {
     border: none;
 }
 
-.checkbox-row {
-    justify-content: space-between;
+textarea {
+    width: 100%;
+    padding: 10px;
+    border-radius: 5px;
+    border: none;
+    resize: vertical;
+    min-height: 80px;
+}
+
+.advanced-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.checkbox-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    white-space: nowrap;
+}
+
+.advanced-row textarea {
+    flex: 1;
 }
 
 button {

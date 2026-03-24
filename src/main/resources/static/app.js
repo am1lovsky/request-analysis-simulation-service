@@ -6,7 +6,8 @@ document.getElementById('simulateForm').addEventListener('submit', async functio
         delay: parseInt(document.getElementById('delay').value) || null,
         responseSize: parseInt(document.getElementById('responseSize').value) || null,
         baseMessage: document.getElementById('baseMessage').value || null,
-        brokenJson: document.getElementById('brokenJson').checked
+        brokenJson: document.getElementById('brokenJson').checked,
+        body: document.getElementById('body').value || null
     };
 
     try {

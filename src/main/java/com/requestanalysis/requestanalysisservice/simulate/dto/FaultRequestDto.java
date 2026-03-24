@@ -7,6 +7,7 @@ public class FaultRequestDto {
     private Integer statusCode;
     private Long delay;
     private Boolean brokenJson;
+    private String body;
     private Integer responseSize;
     private String baseMessage;
 }

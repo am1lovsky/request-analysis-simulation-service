@@ -38,7 +38,12 @@ public class FaultSimulationService {
         int responseSize = resolveResponseSize(request);
         String baseMessage = resolveBaseMessage(request);
         applyDelay(delay);
-        String body = buildBody(baseMessage, responseSize, isJsonBroken);
+        String body;
+        if (request.getBody() != null && !request.getBody().isBlank()) {
+            body = request.getBody();
+        } else {
+            body = buildBody(baseMessage, responseSize, isJsonBroken);
+        }
         FaultResponseMeta meta = buildMeta(statusCode, delay, isJsonBroken, responseSize);
         log.info("Simulated fault meta: {}", meta);
         long executionTime = System.currentTimeMillis() - start;

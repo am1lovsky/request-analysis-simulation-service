@@ -21,16 +21,24 @@
             <input type="text" id="baseMessage" placeholder="Message">
         </div>
 
-        <div class="row checkbox-row">
-            <label>
-                <input type="checkbox" id="brokenJson">
-                Broken JSON
-            </label>
+        <div class="advanced-row">
 
-            <label>
-                <input type="checkbox" id="debug">
-                Debug Mode
-            </label>
+            <div class="checkbox-group">
+                <label>
+                    <input type="checkbox" id="brokenJson">
+                    Broken JSON
+                </label>
+            </div>
+
+            <textarea id="body" placeholder="Custom JSON (optional)"></textarea>
+
+            <div class="checkbox-group">
+                <label>
+                    <input type="checkbox" id="debug">
+                    Debug Mode
+                </label>
+            </div>
+
         </div>
 
         <button type="submit">Simulate</button>
