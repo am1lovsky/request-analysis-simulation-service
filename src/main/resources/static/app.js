@@ -1,14 +1,32 @@
 const brokenJsonCheckbox = document.getElementById('brokenJson');
 const bodyTextArea = document.getElementById('body');
+const baseMessageInput = document.getElementById('baseMessage');
 
 brokenJsonCheckbox.addEventListener('change', function () {
     if (this.checked) {
         bodyTextArea.disabled = true;
         bodyTextArea.placeholder = "Custom Body (disabled when Broken JSON is checked)";
         bodyTextArea.value = "";
+        baseMessageInput.disabled = false;
+        baseMessageInput.placeholder = "Message";
     } else {
         bodyTextArea.disabled = false;
         bodyTextArea.placeholder = "Custom Body (optional)";
+        // Re-check body content if brokenJson is unchecked
+        if (bodyTextArea.value.trim().length > 0) {
+            baseMessageInput.disabled = true;
+            baseMessageInput.placeholder = "Message (disabled when Custom Body is used)";
+        }
+    }
+});
+
+bodyTextArea.addEventListener('input', function () {
+    if (this.value.trim().length > 0) {
+        baseMessageInput.disabled = true;
+        baseMessageInput.placeholder = "Message (disabled when Custom Body is used)";
+    } else {
+        baseMessageInput.disabled = false;
+        baseMessageInput.placeholder = "Message";
     }
 });
 

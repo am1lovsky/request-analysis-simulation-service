@@ -72,7 +72,7 @@ button:hover {
     background: #45a049;
 }
 
-textarea:disabled {
+textarea:disabled, input:disabled {
     background-color: #444;
     color: #888;
     cursor: not-allowed;
