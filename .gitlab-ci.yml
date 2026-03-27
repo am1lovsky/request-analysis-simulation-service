@@ -1,0 +1,13 @@
+stages:
+  - build
+  - test
+
+build:
+  stage: build
+  script:
+    - ./mvnw clean package
+
+test:
+  stage: test
+  script:
+    - ./mvnw test
