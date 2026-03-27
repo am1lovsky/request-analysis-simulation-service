@@ -19,8 +19,8 @@ public class SimulationHistoryService {
         this.repository = repository;
     }
 
-    public void save(FaultRequestDto request, FaultResponseMeta meta, long executionTime) {
-        Simulation logEntry = new Simulation(null, request, meta, Instant.now(), executionTime);
+    public void save(FaultRequestDto request, String httpMethod, FaultResponseMeta meta, long executionTime) {
+        Simulation logEntry = new Simulation(null, httpMethod, request, meta, Instant.now(), executionTime);
         repository.save(logEntry);
     }
 

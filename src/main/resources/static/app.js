@@ -21,7 +21,8 @@ document.getElementById('simulateForm').addEventListener('submit', async functio
         responseSize: parseInt(document.getElementById('responseSize').value) || null,
         baseMessage: document.getElementById('baseMessage').value || null,
         brokenJson: brokenJsonCheckbox.checked,
-        body: bodyTextArea.value || null
+        body: bodyTextArea.value || null,
+        httpMethod: document.getElementById('httpMethod').value
     };
 
     try {
@@ -33,11 +34,14 @@ document.getElementById('simulateForm').addEventListener('submit', async functio
             body: JSON.stringify(data)
         });
 
-        document.getElementById('result').textContent =
-            "Configuration saved. Now your app can call /simulate";
+        const resultElement = document.getElementById('result');
+        resultElement.textContent = "Configuration saved. Now your app can call /simulate";
+
+        resultElement.classList.remove('updated-animation');
+        void resultElement.offsetWidth;
+        resultElement.classList.add('updated-animation');
 
     } catch (error) {
-        document.getElementById('result').textContent =
-            "Error: " + error;
+        document.getElementById('result').textContent = "Error: " + error;
     }
 });

@@ -65,7 +65,8 @@ class ApplicationTest {
                         .param("isDebug", "true"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.body").exists())
-                .andExpect(jsonPath("$.meta").exists());
+                .andExpect(jsonPath("$.meta").exists())
+                .andExpect(jsonPath("$.meta.httpMethod").value("POST"));
     }
 
     @Test

@@ -9,8 +9,15 @@
 
 <div class="container">
     <h1>HTTP Fault Simulator</h1>
-
     <form id="simulateForm">
+        <div class="row">
+            <select id="httpMethod">
+                <option value="POST">POST</option>
+                <option value="GET">GET</option>
+                <option value="PUT">PUT</option>
+                <option value="DELETE">DELETE</option>
+            </select>
+        </div>
         <div class="row">
             <input type="number" id="statusCode" placeholder="Status Code (e.g. 500)">
             <input type="number" id="delay" placeholder="Delay (ms)">

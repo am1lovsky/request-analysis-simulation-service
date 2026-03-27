@@ -17,6 +17,7 @@ import java.time.Instant;
 public class Simulation {
     @Id
     private String id;
+    private String httpMethod;
     private FaultRequestDto requestDto;
     private FaultResponseMeta responseMeta;
     private Instant createAt;

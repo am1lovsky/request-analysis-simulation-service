@@ -17,8 +17,9 @@ public class SimulationResponseGenerator {
         this.patternMessage = properties.patternMessage();
     }
 
-    public SimulatedResponse generate(FaultRequestDto request) {
+    public SimulatedResponse generate(FaultRequestDto request, String actualHttpMethod) {
         int statusCode = resolveStatusCode(request);
+        String httpMethod = resolveHttpMethod(request, actualHttpMethod);
         long delay = resolveDelay(request);
         boolean isJsonBroken = resolveBrokenJson(request);
         int responseSize = resolveResponseSize(request);
@@ -31,12 +32,20 @@ public class SimulationResponseGenerator {
             body = buildBody(baseMessage, responseSize, isJsonBroken);
         }
 
-        FaultResponseMeta meta = buildMeta(statusCode, delay, isJsonBroken, responseSize);
+        FaultResponseMeta meta = buildMeta(statusCode, httpMethod, delay, isJsonBroken, responseSize);
         return new SimulatedResponse(statusCode, body, meta);
     }
 
+    private String resolveHttpMethod(FaultRequestDto request, String actualHttpMethod) {
+        return request.getHttpMethod() != null
+                ? request.getHttpMethod()
+                : actualHttpMethod;
+    }
+
     private int resolveStatusCode(FaultRequestDto request) {
-        return request.getStatusCode() != null ? request.getStatusCode() : 500;
+        return request.getStatusCode() != null
+                ? request.getStatusCode()
+                : 500;
     }
 
     private boolean resolveBrokenJson(FaultRequestDto request) {
@@ -44,20 +53,27 @@ public class SimulationResponseGenerator {
     }
 
     private long resolveDelay(FaultRequestDto request) {
-        return request.getDelay() != null ? request.getDelay() : 0;
+        return request.getDelay() != null
+                ? request.getDelay()
+                : 0;
     }
 
     private int resolveResponseSize(FaultRequestDto request) {
-        return request.getResponseSize() != null ? request.getResponseSize() : 0;
+        return request.getResponseSize() != null
+                ? request.getResponseSize()
+                : 0;
     }
 
     private String resolveBaseMessage(FaultRequestDto request) {
-        return request.getBaseMessage() != null ? request.getBaseMessage() : "Simulated Failure";
+        return request.getBaseMessage() != null
+                ? request.getBaseMessage()
+                : "Simulated Failure";
     }
 
-    private FaultResponseMeta buildMeta(int statusCode, long delay, boolean isJsonBroken, int responseSize) {
+    private FaultResponseMeta buildMeta(int statusCode, String httpMethod, long delay, boolean isJsonBroken, int responseSize) {
         return FaultResponseMeta.builder()
                 .statusCode(statusCode)
+                .httpMethod(httpMethod)
                 .delay(delay)
                 .isJsonBroken(isJsonBroken)
                 .responseSize(responseSize)

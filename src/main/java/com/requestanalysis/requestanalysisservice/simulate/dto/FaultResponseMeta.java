@@ -9,6 +9,7 @@ import java.time.Instant;
 @Builder
 public class FaultResponseMeta {
     private int statusCode;
+    private String httpMethod;
     private long delay;
     private boolean isJsonBroken;
     private int responseSize;

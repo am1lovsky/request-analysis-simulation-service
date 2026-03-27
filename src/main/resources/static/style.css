@@ -83,4 +83,15 @@ pre {
     padding: 15px;
     border-radius: 5px;
     overflow-x: auto;
+    transition: background-color 0.3s ease;
+}
+
+.updated-animation {
+    animation: pulse-bg 0.5s ease;
+}
+
+@keyframes pulse-bg {
+    0% { background-color: #111; transform: scale(1); }
+    50% { background-color: #4CAF50; transform: scale(1.02); }
+    100% { background-color: #111; transform: scale(1); }
 }

@@ -29,8 +29,8 @@ public class FaultSimulationService {
         configurationService.configure(request);
     }
 
-    public ResponseEntity<Object> simulateAndBuildResponse(boolean isDebug) {
-        SimulatedResponse simulatedResponse = simulate();
+    public ResponseEntity<Object> simulateAndBuildResponse(boolean isDebug, String httpMethod) {
+        SimulatedResponse simulatedResponse = simulate(httpMethod);
 
         if (isDebug) {
             DebugResponse debugResponse = new DebugResponse(simulatedResponse.meta(), simulatedResponse.body());
@@ -49,22 +49,22 @@ public class FaultSimulationService {
         }
     }
 
-    public SimulatedResponse simulate() {
+    public SimulatedResponse simulate(String httpMethod) {
         FaultRequestDto configuration = configurationService.getCurrentConfiguration();
-        return simulate(Objects.requireNonNullElseGet(configuration, FaultRequestDto::new));
+        return simulate(Objects.requireNonNullElseGet(configuration, FaultRequestDto::new), httpMethod);
     }
 
-    public SimulatedResponse simulate(FaultRequestDto request) {
+    public SimulatedResponse simulate(FaultRequestDto request, String httpMethod) {
         long start = System.currentTimeMillis();
 
-        SimulatedResponse response = responseGenerator.generate(request);
+        SimulatedResponse response = responseGenerator.generate(request, httpMethod);
 
         applyDelay(response.meta().getDelay());
 
         log.info("Simulated fault meta: {}", response.meta());
         long executionTime = System.currentTimeMillis() - start;
 
-        historyService.save(request, response.meta(), executionTime);
+        historyService.save(request, httpMethod, response.meta(), executionTime);
 
         return response;
     }

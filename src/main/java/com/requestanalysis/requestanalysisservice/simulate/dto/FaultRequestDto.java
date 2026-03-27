@@ -4,6 +4,7 @@ import lombok.Data;
 
 @Data
 public class FaultRequestDto {
+    private String httpMethod;
     private Integer statusCode;
     private Long delay;
     private Boolean brokenJson;
