@@ -1,13 +1,9 @@
+image: maven:3.9.9-eclipse-temurin-21
+
 stages:
   - build
-  - test
 
 build:
   stage: build
   script:
-    - ./mvnw clean package
-
-test:
-  stage: test
-  script:
-    - ./mvnw test
+    - mvn clean package
