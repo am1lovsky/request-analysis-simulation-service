@@ -1,92 +1,72 @@
 package com.requestanalysis.requestanalysisservice.simulate.service;
 
+import com.requestanalysis.requestanalysisservice.simulate.controller.DebugResponse;
 import com.requestanalysis.requestanalysisservice.simulate.dto.FaultRequestDto;
-import com.requestanalysis.requestanalysisservice.simulate.dto.FaultResponseMeta;
-import com.requestanalysis.requestanalysisservice.simulate.model.Simulation;
-import com.requestanalysis.requestanalysisservice.simulate.repository.SimulationRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
 import java.util.Objects;
-import java.util.concurrent.atomic.AtomicReference;
 
-@Slf4j // - simplify logging
+@Slf4j
 @Service
 public class FaultSimulationService {
 
-    private final String patternError;
-    private final String patternMessage;
-    private final SimulationRepository repository;
-    private final AtomicReference<FaultRequestDto> currentConfiguration = new AtomicReference<>();
+    private final SimulationConfigurationService configurationService;
+    private final SimulationResponseGenerator responseGenerator;
+    private final SimulationHistoryService historyService;
 
-    public FaultSimulationService(FaultSimulationServiceProperties properties, SimulationRepository repository) {
-        this.patternError = properties.patternError();
-        this.patternMessage = properties.patternMessage();
-        this.repository = repository;
+    public FaultSimulationService(SimulationConfigurationService configurationService,
+                                  SimulationResponseGenerator responseGenerator,
+                                  SimulationHistoryService historyService) {
+        this.configurationService = configurationService;
+        this.responseGenerator = responseGenerator;
+        this.historyService = historyService;
     }
 
     public void configure(FaultRequestDto request) {
-        currentConfiguration.set(request);
+        configurationService.configure(request);
+    }
+
+    public ResponseEntity<Object> simulateAndBuildResponse(boolean isDebug) {
+        SimulatedResponse simulatedResponse = simulate();
+
+        if (isDebug) {
+            DebugResponse debugResponse = new DebugResponse(simulatedResponse.meta(), simulatedResponse.body());
+            return ResponseEntity.ok(debugResponse);
+        }
+
+        HttpStatus status = resolveHttpStatus(simulatedResponse.statusCode());
+        return ResponseEntity.status(status).body(simulatedResponse.body());
+    }
+
+    private HttpStatus resolveHttpStatus(int code) {
+        try {
+            return HttpStatus.valueOf(code);
+        } catch (IllegalArgumentException e) {
+            return HttpStatus.INTERNAL_SERVER_ERROR;
+        }
+    }
+
+    public SimulatedResponse simulate() {
+        FaultRequestDto configuration = configurationService.getCurrentConfiguration();
+        return simulate(Objects.requireNonNullElseGet(configuration, FaultRequestDto::new));
     }
 
     public SimulatedResponse simulate(FaultRequestDto request) {
         long start = System.currentTimeMillis();
-        int statusCode = resolveStatusCode(request);
-        long delay = resolveDelay(request);
-        boolean isJsonBroken = resolveBrokenJson(request);
-        int responseSize = resolveResponseSize(request);
-        String baseMessage = resolveBaseMessage(request);
-        applyDelay(delay);
-        String body;
-        if (request.getBody() != null && !request.getBody().isBlank()) {
-            body = request.getBody();
-        } else {
-            body = buildBody(baseMessage, responseSize, isJsonBroken);
-        }
-        FaultResponseMeta meta = buildMeta(statusCode, delay, isJsonBroken, responseSize);
-        log.info("Simulated fault meta: {}", meta);
+
+        SimulatedResponse response = responseGenerator.generate(request);
+
+        applyDelay(response.meta().getDelay());
+
+        log.info("Simulated fault meta: {}", response.meta());
         long executionTime = System.currentTimeMillis() - start;
-        saveSimulation(request, meta, executionTime);
-        return new SimulatedResponse(statusCode, body, meta);
-    }
 
-    public SimulatedResponse simulate() {
-        FaultRequestDto configuration = currentConfiguration.get();
-        return simulate(Objects.requireNonNullElseGet(configuration, FaultRequestDto::new));
-    }
+        historyService.save(request, response.meta(), executionTime);
 
-    private void saveSimulation(FaultRequestDto request, FaultResponseMeta meta, long executionTime) {
-        Simulation logEntry = new Simulation(null, request, meta, Instant.now(), executionTime);
-        repository.save(logEntry);
-    }
-
-    private int resolveStatusCode(FaultRequestDto request) {
-        return request.getStatusCode() != null
-                ? request.getStatusCode()
-                : 500;
-    }
-
-    private boolean resolveBrokenJson(FaultRequestDto request) {
-        return Boolean.TRUE.equals(request.getBrokenJson());
-    }
-
-    private long resolveDelay(FaultRequestDto request) {
-        return request.getDelay() != null
-                ? request.getDelay()
-                : 0;
-    }
-
-    private int resolveResponseSize(FaultRequestDto request) {
-        return request.getResponseSize() != null
-                ? request.getResponseSize()
-                : 0;
-    }
-
-    private String resolveBaseMessage(FaultRequestDto request) {
-        return request.getBaseMessage() != null
-                ? request.getBaseMessage()
-                : "Simulated Failure";
+        return response;
     }
 
     private void applyDelay(long delay) {
@@ -100,28 +80,4 @@ public class FaultSimulationService {
             log.warn("Interrupted while waiting for delay", e);
         }
     }
-
-    private FaultResponseMeta buildMeta(int statusCode, long delay, boolean isJsonBroken, int responseSize) {
-        return FaultResponseMeta.builder()
-                .statusCode(statusCode)
-                .delay(delay)
-                .isJsonBroken(isJsonBroken)
-                .responseSize(responseSize)
-                .timestamp(Instant.now())
-                .build();
-    }
-
-    private String buildBody(String baseMessage, int responseSize, boolean isJsonBroken) {
-        int bytes = 1024;
-        int targetBytes = Math.max(responseSize, 1) * bytes;
-        String pattern = isJsonBroken
-                ? patternError + baseMessage + "\" "
-                : patternMessage + baseMessage + "\"}";
-        StringBuilder builder = new StringBuilder();
-        while (builder.length() < targetBytes) {
-            builder.append(pattern).append('\n');
-        }
-        return builder.toString();
-    }
-
 }

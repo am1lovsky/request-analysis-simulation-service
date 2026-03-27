@@ -56,12 +56,16 @@ class ApplicationTest {
         requestDto.setStatusCode(200);
         requestDto.setBaseMessage("Success Test");
 
-        mockMvc.perform(post("/simulate")
+        mockMvc.perform(post("/configure")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(requestDto)))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(post("/simulate")
+                        .param("isDebug", "true"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.body").exists())
-                .andExpect(jsonPath("$.body").exists());
+                .andExpect(jsonPath("$.meta").exists());
     }
 
     @Test

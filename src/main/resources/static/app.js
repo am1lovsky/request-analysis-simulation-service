@@ -1,3 +1,17 @@
+const brokenJsonCheckbox = document.getElementById('brokenJson');
+const bodyTextArea = document.getElementById('body');
+
+brokenJsonCheckbox.addEventListener('change', function () {
+    if (this.checked) {
+        bodyTextArea.disabled = true;
+        bodyTextArea.placeholder = "Custom Body (disabled when Broken JSON is checked)";
+        bodyTextArea.value = "";
+    } else {
+        bodyTextArea.disabled = false;
+        bodyTextArea.placeholder = "Custom Body (optional)";
+    }
+});
+
 document.getElementById('simulateForm').addEventListener('submit', async function (e) {
     e.preventDefault();
 
@@ -6,8 +20,8 @@ document.getElementById('simulateForm').addEventListener('submit', async functio
         delay: parseInt(document.getElementById('delay').value) || null,
         responseSize: parseInt(document.getElementById('responseSize').value) || null,
         baseMessage: document.getElementById('baseMessage').value || null,
-        brokenJson: document.getElementById('brokenJson').checked,
-        body: document.getElementById('body').value || null
+        brokenJson: brokenJsonCheckbox.checked,
+        body: bodyTextArea.value || null
     };
 
     try {

@@ -72,6 +72,12 @@ button:hover {
     background: #45a049;
 }
 
+textarea:disabled {
+    background-color: #444;
+    color: #888;
+    cursor: not-allowed;
+}
+
 pre {
     background: #111;
     padding: 15px;
