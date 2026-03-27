@@ -2,11 +2,8 @@ package com.requestanalysis.requestanalysisservice.simulate.controller;
 
 import com.requestanalysis.requestanalysisservice.simulate.dto.FaultRequestDto;
 import com.requestanalysis.requestanalysisservice.simulate.model.Simulation;
-import com.requestanalysis.requestanalysisservice.simulate.repository.SimulationRepository;
 import com.requestanalysis.requestanalysisservice.simulate.service.FaultSimulationService;
-import com.requestanalysis.requestanalysisservice.simulate.service.SimulatedResponse;
-import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
+import com.requestanalysis.requestanalysisservice.simulate.service.SimulationHistoryService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,50 +17,26 @@ import java.util.List;
 public class FaultSimulationController {
 
     private final FaultSimulationService faultSimulationService;
-    private final SimulationRepository repository;
+    private final SimulationHistoryService historyService;
 
-    public FaultSimulationController(FaultSimulationService faultSimulationService, SimulationRepository repository) {
+    public FaultSimulationController(FaultSimulationService faultSimulationService, SimulationHistoryService historyService) {
         this.faultSimulationService = faultSimulationService;
-        this.repository = repository;
+        this.historyService = historyService;
     }
 
     @PostMapping("/simulate")
     public ResponseEntity<Object> simulate(@RequestParam(name = "isDebug", required = false, defaultValue = "false") boolean isDebug) {
-        SimulatedResponse simulatedResponse = faultSimulationService.simulate();
-        HttpStatus status = resolveHttpStatus(simulatedResponse);
-        return buildResponse(simulatedResponse, status, isDebug);
+        return faultSimulationService.simulateAndBuildResponse(isDebug);
     }
 
     @GetMapping("/simulate/history")
     public List<Simulation> getHistory() {
-        return repository.findAll(Sort.by(Sort.Direction.DESC, "createdAt"));
+        return historyService.getHistory();
     }
 
     @PostMapping("/configure")
-    public ResponseEntity<Void> configure(@RequestBody FaultRequestDto request) {
+    public void configure(@RequestBody FaultRequestDto request) {
         faultSimulationService.configure(request);
-        return ResponseEntity.ok().build();
-    }
-
-    private HttpStatus resolveHttpStatus(SimulatedResponse simulatedResponse) {
-        HttpStatus status = HttpStatus.resolve(simulatedResponse.statusCode());
-        return status == null ? HttpStatus.INTERNAL_SERVER_ERROR : status;
-    }
-
-    private ResponseEntity<Object> buildResponse(SimulatedResponse simulatedResponse, HttpStatus status, boolean isDebug) {
-        if (isDebug) {
-            return buildDebugResponse(simulatedResponse, status);
-        }
-        return buildPlainResponse(simulatedResponse, status);
-    }
-
-    private ResponseEntity<Object> buildPlainResponse(SimulatedResponse simulatedResponse, HttpStatus status) {
-        return ResponseEntity.status(status).body(simulatedResponse.body());
-    }
-
-    private ResponseEntity<Object> buildDebugResponse(SimulatedResponse simulatedResponse, HttpStatus status) {
-        DebugResponse debugResponse = new DebugResponse(simulatedResponse.meta(), simulatedResponse.body());
-        return ResponseEntity.status(status).body(debugResponse);
     }
 
 }
