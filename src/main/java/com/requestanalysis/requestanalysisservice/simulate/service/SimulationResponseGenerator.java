@@ -31,7 +31,6 @@ public class SimulationResponseGenerator {
         } else {
             body = buildBody(baseMessage, responseSize, isJsonBroken);
         }
-
         FaultResponseMeta meta = buildMeta(statusCode, httpMethod, delay, isJsonBroken, responseSize);
         return new SimulatedResponse(statusCode, body, meta);
     }
