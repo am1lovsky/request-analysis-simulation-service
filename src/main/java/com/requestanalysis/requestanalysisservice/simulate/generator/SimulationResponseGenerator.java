@@ -1,7 +1,9 @@
-package com.requestanalysis.requestanalysisservice.simulate.service;
+package com.requestanalysis.requestanalysisservice.simulate.generator;
 
 import com.requestanalysis.requestanalysisservice.simulate.dto.FaultRequestDto;
 import com.requestanalysis.requestanalysisservice.simulate.dto.FaultResponseMeta;
+import com.requestanalysis.requestanalysisservice.simulate.service.FaultSimulationServiceProperties;
+import com.requestanalysis.requestanalysisservice.simulate.service.SimulatedResponse;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
