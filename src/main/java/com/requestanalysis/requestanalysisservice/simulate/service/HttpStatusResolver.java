@@ -9,11 +9,15 @@ import org.springframework.stereotype.Component;
 public class HttpStatusResolver {
 
     public HttpStatus resolve(int statusCode) {
-        try {
-            return HttpStatus.valueOf(statusCode);
-        } catch (IllegalArgumentException e) {
+        if (statusCode < 100 || statusCode > 599) {
+            log.warn("Invalid HTTP status code: {}, falling back to 500", statusCode);
+            return HttpStatus.INTERNAL_SERVER_ERROR;
+        }
+        HttpStatus status = HttpStatus.resolve(statusCode);
+        if (status == null) {
             log.warn("Unrecognized HTTP status code: {}, falling back to 500", statusCode);
             return HttpStatus.INTERNAL_SERVER_ERROR;
         }
+        return status;
     }
 }
