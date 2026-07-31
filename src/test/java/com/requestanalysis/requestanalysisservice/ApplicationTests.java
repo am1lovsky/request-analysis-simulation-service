@@ -159,7 +159,7 @@ class ApplicationTest {
         Simulation simulation = new Simulation();
         simulation.setId("1");
         simulation.setHttpMethod("GET");
-        simulation.setCreateAt(Instant.now());
+        simulation.setCreatedAt(Instant.now());
 
         when(simulationRepository.findAll(any(Sort.class))).thenReturn(List.of(simulation));
 

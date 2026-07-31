@@ -20,6 +20,6 @@ public class Simulation {
     private String httpMethod;
     private FaultRequestDto requestDto;
     private FaultResponseMeta responseMeta;
-    private Instant createAt;
+    private Instant createdAt;
     private long executionTime;
 }

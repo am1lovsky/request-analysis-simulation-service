@@ -8,8 +8,11 @@ import org.springframework.stereotype.Component;
 @Component
 public class HttpStatusResolver {
 
+    private static final int MINIMUM_RESPONSE_SIZE = 100;
+    private static final int MAXIMUM_RESPONSE_SIZE = 200;
+
     public HttpStatus resolve(int statusCode) {
-        if (statusCode < 100 || statusCode > 599) {
+        if (statusCode < MINIMUM_RESPONSE_SIZE || statusCode > MAXIMUM_RESPONSE_SIZE) {
             log.warn("Invalid HTTP status code: {}, falling back to 500", statusCode);
             return HttpStatus.INTERNAL_SERVER_ERROR;
         }
